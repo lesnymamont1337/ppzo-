@@ -1,0 +1,102 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace KatalogMuzyczny
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Słownik z gatunkami i artystami wraz z biografiami
+            var katalog = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Klasyka", new Dictionary<string, string>
+                    {
+                        { "Fryderyk Chopin", "Polski kompozytor i pianista z XIX wieku, mistrz muzyki romantycznej, autor słynnych nokturnów i études." },
+                        { "Jan Sebastian Bach", "Niemiecki kompozytor barokowy, twórca arcydzieł muzyki religijnej i instrumentalnej, znany z Pasji Św. Mateusza." },
+                        { "Ludwig van Beethoven", "Niemiecki kompozytor klasycyzmu, który zrewolucjonizował muzykę, mimo swojej głuchoty skomponował najwspanialsze symfonie." }
+                    }
+                },
+                { "Rock", new Dictionary<string, string>
+                    {
+                        { "Perfect", "Polska legenda rocka, zespół z Gdańska znany z hitów takich jak 'Autostrada A2' i 'Chcę być sobą'." },
+                        { "Lady Pank", "Polska grupa rockowa, ikona polskiego rocka lat 80., autorzy piosenki 'Pani Pani'." },
+                        { "Queen", "Brytyjski zespół rockowy z Freddie Mercurym, twórcy 'Bohemian Rhapsody' i wielu światowych hitów." },
+                        { "Metallica", "Amerykański zespół heavy metalu, jeden z najpopularniejszych zespołów metalowych wszech czasów." }
+                    }
+                },
+                { "Jazz", new Dictionary<string, string>
+                    {
+                        { "Krzysztof Komeda", "Polski jazzman i kompozytor, pionier jazzowego brzmienia, twórca kultowych filmowych ścieżek dźwiękowych." },
+                        { "Miles Davis", "Legendarny amerykański trumpecista, pionier jazz-fusion, jeden z najpłodniejszych twórców jazzowych." },
+                        { "Louis Armstrong", "Amerykański jazzman, zwany 'Ojcem jazzowego wokalu', jego głos i trąbka zmieniły muzykę na zawsze." }
+                    }
+                },
+                { "Pop", new Dictionary<string, string>
+                    {
+                        { "Dawid Podsiadło", "Polski piosenkarz i kompozytor, autor hitów takich jak 'Żyj pięknie' i 'Spadam', przedstawiciel popu z przesłaniem." },
+                        { "Sanah", "Polska wokalistka, znana z gościnnych kolaboracji i piosenek takich jak 'Szamanka'." },
+                        { "Michael Jackson", "Amerykański pop idol, 'King of Pop', autor przebojów jak 'Thriller' i 'Billie Jean'." },
+                        { "Madonna", "Amerykańska piosenkarka i ikonka popu, pionierka w branży muzyki popowej, znana jako 'Królowa Popu'." }
+                    }
+                },
+                { "Russian SoundCloud Rap", new Dictionary<string, string>
+                    {
+                        { "Madk1d", "Rosyjski raper z SoundCloud, znany z eksperymentalnego podejścia do hip-hopu i surowych produkcji." },
+                        { "Lazzy2Wice", "Rosyjski artysta cloud rap, twórca minimalistycznych i atmosferycznych utworów." },
+                        { "Cupsize", "Rosyjski producent i raper, znany z artystycznego podejścia do tworzenia muzyki elektronicznej i rapowej." },
+                        { "TrillPill", "Rosyjski raper z SoundCloud, eksperymenter w stylu trap i cloud rap." }
+                    }
+                }
+            };
+
+            Console.WriteLine("=== Twój Katalog Muzyczny ===");
+            
+            while (true)
+            {
+                Console.WriteLine("\nDostępne gatunki: " + string.Join(", ", katalog.Keys));
+                Console.Write("Wpisz nazwę gatunku (lub 'koniec', aby wyjść): ");
+                
+                string input = Console.ReadLine();
+
+                if (input?.ToLower() == "koniec") break;
+
+                if (katalog.TryGetValue(input, out Dictionary<string, string> wykonawcy))
+                {
+                    Console.WriteLine($"\n=== {input.ToUpper()} ===");
+                    
+                    // Wyświetl listę wykonawców
+                    var listaWykonawcow = wykonawcy.Keys.ToList();
+                    for (int i = 0; i < listaWykonawcow.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}. {listaWykonawcow[i]}");
+                    }
+                    
+                    Console.Write("\nWybierz numer wykonawcy (lub 'powrót', aby wrócić): ");
+                    string wybor = Console.ReadLine();
+
+                    if (wybor?.ToLower() == "powrót") continue;
+
+                    if (int.TryParse(wybor, out int numer) && numer > 0 && numer <= listaWykonawcow.Count)
+                    {
+                        string wybranyWykonawca = listaWykonawcow[numer - 1];
+                        string biografia = wykonawcy[wybranyWykonawca];
+
+                        Console.WriteLine($"\n {wybranyWykonawca}");
+                        Console.WriteLine($"════════════════════════════════════════");
+                        Console.WriteLine($"{biografia}");
+                        Console.WriteLine($"════════════════════════════════════════");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Nieprawidłowy numer!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Nie znaleziono takiego gatunku w bazie.");
+                }
+            }
+        }
+    }
