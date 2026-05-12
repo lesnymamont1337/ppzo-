@@ -1,0 +1,65 @@
+import datetime
+
+class Transaction:
+    def __init__(self, type, amount):
+        self.type = type
+        self.amount = amount
+        self.timestamp = datetime.datetime.now()
+
+    def __str__(self):
+        return f"{self.timestamp.strftime('%Y-%m-%d %H:%M:%S')} | {self.type}: {self.amount} PLN"
+
+class Account:
+    def __init__(self, account_number, owner, initial_balance=0):
+        self.account_number = account_number
+        self.owner = owner
+        self.__balance = initial_balance  # Atrybut prywatny
+        self.history = []
+
+    def deposit(self, amount):
+        if amount > 0:
+            self.__balance += amount
+            self.history.append(Transaction("Wpłata", amount))
+            return True
+        return False
+
+    def withdraw(self, amount):
+        if 0 < amount <= self.__balance:
+            self.__balance -= amount
+            self.history.append(Transaction("Wypłata", amount))
+            return True
+        print("Błąd: Niewystarczające środki lub nieprawidłowa kwota.")
+        return False
+
+    def get_balance(self):
+        return self.__balance
+
+class Bank:
+    def __init__(self, name):
+        self.name = name
+        self.accounts = {}
+
+    def create_account(self, number, owner, balance=0):
+        new_acc = Account(number, owner, balance)
+        self.accounts[number] = new_acc
+        return new_acc
+
+    def transfer(self, from_num, to_num, amount):
+        if from_num in self.accounts and to_num in self.accounts:
+            if self.accounts[from_num].withdraw(amount):
+                self.accounts[to_num].deposit(amount)
+                print(f"Przelew {amount} PLN zrealizowany.")
+        else:
+            print("Nie odnaleziono kont.")
+
+# PRZYKŁAD UŻYCIA
+my_bank = Bank("Narodowy Bank Programistów")
+acc1 = my_bank.create_account("101", "Jan Kowalski", 500)
+acc2 = my_bank.create_account("102", "Anna Nowak", 200)
+
+acc1.deposit(150)
+my_bank.transfer("101", "102", 300)
+
+print(f"Saldo Jana: {acc1.get_balance()} PLN")
+for t in acc1.history:
+    print(t)
