@@ -1,0 +1,77 @@
+def main():
+    katalog = {
+        "Klasyka": {
+            "Fryderyk Chopin": "Polski kompozytor i pianista z XIX wieku, mistrz muzyki romantycznej, autor słynnych nokturnów i études.",
+            "Jan Sebastian Bach": "Niemiecki kompozytor barokowy, twórca arcydzieł muzyki religijnej i instrumentalnej, znany z Pasji Św. Mateusza.",
+            "Ludwig van Beethoven": "Niemiecki kompozytor klasycyzmu, który zrewolucjonizował muzykę, mimo swojej głuchoty skomponował najwspanialsze symfonie."
+        },
+        "Rock": {
+            "Perfect": "Polska legenda rocka, zespół z Gdańska znany z hitów takich jak 'Autostrada A2' i 'Chcę być sobą'.",
+            "Lady Pank": "Polska grupa rockowa, ikona polskiego rocka lat 80., autorzy piosenki 'Pani Pani'.",
+            "Queen": "Brytyjski zespół rockowy z Freddie Mercurym, twórcy 'Bohemian Rhapsody' i wielu światowych hitów.",
+            "Metallica": "Amerykański zespół heavy metalu, jeden z najpopularniejszych zespołów metalowych wszech czasów."
+        },
+        "Jazz": {
+            "Krzysztof Komeda": "Polski jazzman i kompozytor, pionier jazzowego brzmienia, twórca kultowych filmowych ścieżek dźwiękowych.",
+            "Miles Davis": "Legendarny amerykański trumpecista, pionier jazz-fusion, jeden z najpłodniejszych twórców jazzowych.",
+            "Louis Armstrong": "Amerykański jazzman, zwany 'Ojcem jazzowego wokalu', jego głos i trąbka zmieniły muzykę na zawsze."
+        },
+        "Pop": {
+            "Dawid Podsiadło": "Polski piosenkarz i kompozytor, autor hitów takich jak 'Żyj pięknie' i 'Spadam', przedstawiciel popu z przesłaniem.",
+            "Sanah": "Polska wokalistka, znana z gościnnych kolaboracji i piosenek takich jak 'Szamanka'.",
+            "Michael Jackson": "Amerykański pop idol, 'King of Pop', autor przebojów jak 'Thriller' i 'Billie Jean'.",
+            "Madonna": "Amerykańska piosenkarka i ikonka popu, pionierka w branży muzyki popowej, znana jako 'Królowa Popu'."
+        },
+        "Russian SoundCloud Rap": {
+            "Madk1d": "Rosyjski raper z SoundCloud, znany z eksperymentalnego podejścia do hip-hopu i surowych produkcji.",
+            "Lazzy2Wice": "Rosyjski artysta cloud rap, twórca minimalistycznych i atmosferycznych utworów.",
+            "Cupsize": "Rosyjski producent i raper, znany z artystycznego podejścia do tworzenia muzyki elektronicznej i rapowej.",
+            "TrillPill": "Rosyjski raper z SoundCloud, eksperymenter w stylu trap i cloud rap."
+        }
+    }
+
+    print("=== Twój Katalog Muzyczny ===")
+
+    while True:
+        genres = list(katalog.keys())
+        print(f"\nDostępne gatunki: {', '.join(genres)}")
+        
+        user_input = input("Wpisz nazwę gatunku (lub 'koniec', aby wyjść): ").strip()
+
+        if user_input.lower() == 'koniec':
+            break
+
+        found_genre = next((g for g in genres if g.lower() == user_input.lower()), None)
+
+        if found_genre:
+            wykonawcy_dict = katalog[found_genre]
+            lista_wykonawcow = list(wykonawcy_dict.keys())
+
+            print(f"\n=== {found_genre.upper()} ===")
+            for i, name in enumerate(lista_wykonawcow, 1):
+                print(f"{i}. {name}")
+
+            wybor = input("\nWybierz numer wykonawcy (lub 'powrót', aby wrócić): ").strip()
+
+            if wybor.lower() == 'powrót':
+                continue
+
+            if wybor.isdigit():
+                index = int(wybor) - 1
+                if 0 <= index < len(lista_wykonawcow):
+                    wybrany_artysta = lista_wykonawcow[index]
+                    biografia = wykonawcy_dict[wybrany_artysta]
+
+                    print(f"\n {wybrany_artysta}")
+                    print("=" * 40)
+                    print(biografia)
+                    print("=" * 40)
+                else:
+                    print("Nieprawidłowy numer!")
+            else:
+                print("Proszę wpisać liczbę.")
+        else:
+            print("Nie znaleziono takiego gatunku w bazie.")
+
+if __name__ == "__main__":
+    main()
