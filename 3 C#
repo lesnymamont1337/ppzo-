@@ -1,0 +1,141 @@
+using System;
+using System.Collections.Generic;
+
+// --- 1. INTERFEJSY I ABSTRAKCJA ---
+
+public interface IElectricVehicle
+{
+    void Charge();
+}
+
+public abstract class Vehicle
+{
+    public int Id { get; set; }
+    public string Brand { get; set; }
+    public string Model { get; set; }
+    private decimal _rentalRate;
+    public bool IsAvailable { get; protected set; } = true;
+
+    // Enkapsulacja z walidacją
+    public decimal RentalRate
+    {
+        get => _rentalRate;
+        set
+        {
+            if (value < 0) throw new ArgumentException("Stawka nie może być ujemna!");
+            _rentalRate = value;
+        }
+    }
+
+    public Vehicle(int id, string brand, string model, decimal rate)
+    {
+        Id = id;
+        Brand = brand;
+        Model = model;
+        RentalRate = rate;
+    }
+
+    // Polimorfizm - metoda abstrakcyjna
+    public abstract string GetVehicleType();
+
+    // Przeciążanie metod (Overloading)
+    public void Rent() => Rent(DateTime.Now);
+    
+    public void Rent(DateTime date)
+    {
+        IsAvailable = false;
+        Console.WriteLine($"Pojazd {Id} wypożyczony: {date}");
+    }
+}
+
+// --- 2. DZIEDZICZENIE ---
+
+public class Car : Vehicle
+{
+    public string FuelType { get; set; }
+
+    public Car(int id, string brand, string model, decimal rate, string fuel) 
+        : base(id, brand, model, rate) // Wywołanie konstruktora bazowego
+    {
+        FuelType = fuel;
+    }
+
+    public override string GetVehicleType() => "Samochód Osobowy";
+}
+
+public class Scooter : Vehicle, IElectricVehicle
+{
+    public int BatteryCapacity { get; set; }
+
+    public Scooter(int id, string brand, string model, decimal rate, int battery) 
+        : base(id, brand, model, rate)
+    {
+        BatteryCapacity = battery;
+    }
+
+    public override string GetVehicleType() => "Hulajnoga Elektryczna";
+
+    public void Charge() => Console.WriteLine($"Ładowanie {Brand}... Bateria: {BatteryCapacity}mAh");
+}
+
+// --- 3. KOMPOZYCJA I LOGIKA BIZNESOWA ---
+
+public class User
+{
+    public string Name { get; private set; } // Read-only z zewnątrz
+    public string Email { get; set; }
+    public List<Vehicle> History { get; } = new List<Vehicle>();
+
+    public User(string name, string email)
+    {
+        Name = name;
+        Email = email;
+    }
+}
+
+public class Rental
+{
+    public User Client { get; set; }
+    public Vehicle RentedVehicle { get; set; }
+    public DateTime StartDate { get; set; }
+
+    public Rental(User user, Vehicle vehicle)
+    {
+        Client = user;
+        RentedVehicle = vehicle;
+        StartDate = DateTime.Now;
+    }
+}
+
+public static class RentalManager
+{
+    public static List<Rental> ActiveRentals = new List<Rental>();
+
+    public static void RentVehicle(User user, Vehicle vehicle)
+    {
+        if (vehicle.IsAvailable)
+        {
+            vehicle.Rent();
+            ActiveRentals.Add(new Rental(user, vehicle));
+            user.History.Add(vehicle);
+            Console.WriteLine($"Sukces: {user.Name} wypożyczył {vehicle.Brand}");
+        }
+    }
+}
+
+// --- PROGRAM GŁÓWNY ---
+
+class Program
+{
+    static void Main()
+    {
+        var tesla = new Car(1, "Tesla", "S", 200, "Electric");
+        var xiaomi = new Scooter(2, "Xiaomi", "Pro 2", 30, 12000);
+        var uzytkownik = new User("Adam Nowak", "adam@nowak.pl");
+
+        RentalManager.RentVehicle(uzytkownik, xiaomi);
+        xiaomi.Charge();
+        
+        Console.WriteLine($"Typ pojazdu: {tesla.GetVehicleType()}");
+    }
+}
