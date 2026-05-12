@@ -1,0 +1,93 @@
+using System;
+using System.Collections.Generic;
+
+namespace BankSystem
+{
+    public class Transaction
+    {
+        public string Type { get; }
+        public double Amount { get; }
+        public DateTime Timestamp { get; }
+
+        public Transaction(string type, double amount)
+        {
+            Type = type;
+            Amount = amount;
+            Timestamp = DateTime.Now;
+        }
+
+        public override string ToString() => $"{Timestamp:yyyy-MM-dd HH:mm:ss} | {Type}: {Amount} PLN";
+    }
+
+    public class Account
+    {
+        public string Number { get; }
+        public string Owner { get; }
+        private double _balance; // Pole prywatne
+        public List<Transaction> History { get; } = new List<Transaction>();
+
+        public Account(string number, string owner, double initialBalance)
+        {
+            Number = number;
+            Owner = owner;
+            _balance = initialBalance;
+        }
+
+        public double GetBalance() => _balance;
+
+        public bool Deposit(double amount)
+        {
+            if (amount <= 0) return false;
+            _balance += amount;
+            History.Add(new Transaction("Wpłata", amount));
+            return true;
+        }
+
+        public bool Withdraw(double amount)
+        {
+            if (amount <= 0 || amount > _balance) return false;
+            _balance -= amount;
+            History.Add(new Transaction("Wypłata", amount));
+            return true;
+        }
+    }
+
+    public class Bank
+    {
+        private Dictionary<string, Account> _accounts = new Dictionary<string, Account>();
+
+        public void AddAccount(Account acc) => _accounts.Add(acc.Number, acc);
+
+        public void ProcessTransfer(string fromNum, string toNum, double amount)
+        {
+            if (_accounts.ContainsKey(fromNum) && _accounts.ContainsKey(toNum))
+            {
+                if (_accounts[fromNum].Withdraw(amount))
+                {
+                    _accounts[toNum].Deposit(amount);
+                    Console.WriteLine("Przelew zakończony sukcesem.");
+                }
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            Bank bank = new Bank();
+            Account jan = new Account("101", "Jan Kowalski", 1000);
+            Account anna = new Account("102", "Anna Nowak", 500);
+
+            bank.AddAccount(jan);
+            bank.AddAccount(anna);
+
+            jan.Withdraw(200);
+            bank.ProcessTransfer("101", "102", 400);
+
+            Console.WriteLine($"Saldo Jana: {jan.GetBalance()} PLN");
+            Console.WriteLine("Historia Jana:");
+            jan.History.ForEach(t => Console.WriteLine(t));
+        }
+    }
+}
