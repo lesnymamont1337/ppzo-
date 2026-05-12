@@ -1,0 +1,108 @@
+from abc import ABC, abstractmethod
+from datetime import datetime
+
+# --- 1. INTERFEJSY / KLASY ABSTRAKCYJNE (ABSTRAKCJA) ---
+
+class ElectricVehicle(ABC):
+    @abstractmethod
+    def charge(self):
+        pass
+
+class Vehicle(ABC):
+    def __init__(self, vehicle_id, brand, model, rental_rate):
+        self.id = vehicle_id
+        self.brand = brand
+        self.model = model
+        self._rental_rate = rental_rate  # Prywatne (enkapsulacja)
+        self.is_available = True
+
+    @property
+    def rental_rate(self):
+        return self._rental_rate
+
+    @rental_rate.setter
+    def rental_rate(self, value):
+        if value < 0:
+            raise ValueError("Stawka nie może być ujemna!")
+        self._rental_rate = value
+
+    @abstractmethod
+    def vehicle_type(self):
+        """Metoda polimorficzna"""
+        pass
+
+    def rent(self, date=None):
+        """Przykład przeciążenia (symulowanego w Pythonie przez default value)"""
+        self.is_available = False
+        rent_date = date if date else datetime.now()
+        print(f"Pojazd {self.id} wypożyczony dnia: {rent_date}")
+
+# --- 2. DZIEDZICZENIE I POLIMORFIZM ---
+
+class Car(Vehicle):
+    def __init__(self, vehicle_id, brand, model, rental_rate, fuel_type):
+        super().__init__(vehicle_id, brand, model, rental_rate)
+        self.fuel_type = fuel_type
+
+    def vehicle_type(self):
+        return "Samochód Osobowy"
+
+class Scooter(Vehicle, ElectricVehicle):
+    def __init__(self, vehicle_id, brand, model, rental_rate, battery_capacity):
+        super().__init__(vehicle_id, brand, model, rental_rate)
+        self.battery_capacity = battery_capacity
+
+    def vehicle_type(self):
+        return "Hulajnoga Elektryczna"
+
+    def charge(self):
+        print(f"Ładowanie hulajnogi {self.brand}... Bateria {self.battery_capacity}mAh.")
+
+# --- 3. ENKAPSULACJA (User) ---
+
+class User:
+    def __init__(self, name, email):
+        self.__name = name  # Ściśle prywatne
+        self.email = email
+        self.history = []
+
+    @property
+    def name(self):
+        return self.__name
+
+# --- 4. KOMPOZYCJA I METODY STATYCZNE ---
+
+class Rental:
+    def __init__(self, user, vehicle):
+        self.user = user      # Kompozycja: Rental posiada Usera
+        self.vehicle = vehicle # Kompozycja: Rental posiada Pojazd
+        self.start_date = datetime.now()
+
+class RentalManager:
+    active_rentals = []  # Właściwość statyczna
+
+    @staticmethod
+    def rent_vehicle(user, vehicle):
+        if vehicle.is_available:
+            vehicle.rent()
+            new_rental = Rental(user, vehicle)
+            RentalManager.active_rentals.append(new_rental)
+            user.history.append(vehicle)
+            print(f"Sukces: {user.name} wypożyczył {vehicle.brand}.")
+        else:
+            print("Pojazd niedostępny.")
+
+# --- PRZYKŁAD DZIAŁANIA ---
+
+# Tworzenie obiektów
+auto = Car(1, "Tesla", "Model 3", 150, "Electric")
+hulajnoga = Scooter(2, "Xiaomi", "M365", 20, 5000)
+klient = User("Jan Kowalski", "jan@example.com")
+
+# Wykorzystanie polimorfizmu
+for v in [auto, hulajnoga]:
+    print(f"Typ: {v.vehicle_type()}, Cena: {v.rental_rate}")
+
+# Wypożyczenie
+RentalManager.rent_vehicle(klient, hulajnoga)
+hulajnoga.charge()  # Metoda z interfejsu
